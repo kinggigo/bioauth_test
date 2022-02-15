@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import "package:get/get.dart";
-
 import 'package:local_auth/local_auth.dart';
 
-class MainController extends GetxController {
+// import 'package:local_auth/local_auth.dart';
 
+class MainController extends GetxController {
   final supportState = _SupportState.unknown.obs;
   final authorized = ''.obs;
   final canCheckBiometrics = false.obs;
@@ -15,12 +16,15 @@ class MainController extends GetxController {
   final isAuthenticating = false.obs;
 
   @override
-  void onInit() async{
+  void onInit() async {
     super.onInit();
 
     bool isSupported = false;
-    isSupported =  await auth.isDeviceSupported();
-    supportState.value = isSupported ? _SupportState.supported : _SupportState.unsupported;
+    // isSupported = await auth.isDeviceSupported();
+    WidgetsFlutterBinding.ensureInitialized();
+    isSupported = await auth.isDeviceSupported();
+    supportState.value =
+        isSupported ? _SupportState.supported : _SupportState.unsupported;
   }
 
   Future<void> cancelAuthentication() async {
@@ -71,7 +75,7 @@ class MainController extends GetxController {
       // });
       authenticated = await auth.authenticate(
           localizedReason:
-          'Scan your fingerprint (or face or whatever) to authenticate',
+              'Scan your fingerprint (or face or whatever) to authenticate',
           useErrorDialogs: true,
           stickyAuth: true,
           biometricOnly: true);
@@ -101,6 +105,7 @@ class MainController extends GetxController {
     //   _authorized = message;
     // });
   }
+
   Future<void> checkBiometrics() async {
     bool canCheckBiometrics1;
     try {

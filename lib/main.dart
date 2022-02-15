@@ -15,16 +15,17 @@ import 'package:get/get.dart';
 
 import 'main.controller.dart';
 
-Future<void> main() async{
+Future<void> main() async {
   // runApp(MyApp());
 
   LocalAuthentication auth = LocalAuthentication();
-  await Get.put<LocalAuthentication>(auth);
+  Get.lazyPut<LocalAuthentication>(() => auth);
   runApp(App());
 }
 
-class App extends GetView<MainController>{
-  final controller  = Get.put(MainController());
+class App extends GetView<MainController> {
+  @override
+  final controller = Get.put(MainController());
 
   @override
   Widget build(BuildContext context) {
@@ -39,28 +40,30 @@ class App extends GetView<MainController>{
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-
                 if (controller.supportState.value == _SupportState.unknown)
                   const CircularProgressIndicator()
-                else if (controller.supportState.value == _SupportState.supported)
+                else if (controller.supportState.value ==
+                    _SupportState.supported)
                   const Text('This device is supported')
                 else
                   const Text('This device is not supported'),
                 const Divider(height: 100),
-                Obx(() =>Text('Can check biometrics: ${controller.canCheckBiometrics.value}\n')),
-
+                Obx(() => Text(
+                    'Can check biometrics: ${controller.canCheckBiometrics.value}\n')),
                 ElevatedButton(
                   child: const Text('Check biometrics'),
                   onPressed: controller.checkBiometrics,
                 ),
                 const Divider(height: 100),
-                Obx(()=> Text('Available biometrics: ${controller.availableBiometrics.string}\n')),
+                Obx(() => Text(
+                    'Available biometrics: ${controller.availableBiometrics.string}\n')),
                 ElevatedButton(
                   child: const Text('Get available biometrics'),
                   onPressed: controller.getAvailableBiometrics,
                 ),
                 const Divider(height: 100),
-                Obx(() => Text('Current State: ${controller.authorized.value}\n') ),
+                Obx(() =>
+                    Text('Current State: ${controller.authorized.value}\n')),
                 if (controller.isAuthenticating.value)
                   ElevatedButton(
                     onPressed: controller.cancelAuthentication,
@@ -105,8 +108,8 @@ class App extends GetView<MainController>{
         ),
       ),
     );
-    }
   }
+}
 
 //
 
@@ -128,9 +131,9 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     auth.isDeviceSupported().then(
           (bool isSupported) => setState(() => _supportState = isSupported
-          ? _SupportState.supported
-          : _SupportState.unsupported),
-    );
+              ? _SupportState.supported
+              : _SupportState.unsupported),
+        );
   }
 
   Future<void> _checkBiometrics() async {
@@ -194,7 +197,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     setState(
-            () => _authorized = authenticated ? 'Authorized' : 'Not Authorized');
+        () => _authorized = authenticated ? 'Authorized' : 'Not Authorized');
   }
 
   Future<void> _authenticateWithBiometrics() async {
@@ -206,7 +209,7 @@ class _MyAppState extends State<MyApp> {
       });
       authenticated = await auth.authenticate(
           localizedReason:
-          'Scan your fingerprint (or face or whatever) to authenticate',
+              'Scan your fingerprint (or face or whatever) to authenticate',
           useErrorDialogs: true,
           stickyAuth: true,
           biometricOnly: true);
